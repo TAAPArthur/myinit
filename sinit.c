@@ -7,8 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define LEN(x)	(sizeof (x) / sizeof *(x))
-#define TIMEO	30
+#define LEN(x) (sizeof (x) / sizeof *(x))
 
 static void sigpoweroff(void);
 static void sigreap(void);
@@ -21,7 +20,6 @@ static struct {
 } sigmap[] = {
 	{ SIGUSR1, sigpoweroff },
 	{ SIGCHLD, sigreap     },
-	{ SIGALRM, sigreap     },
 	{ SIGINT,  sigreboot   },
 };
 
@@ -42,7 +40,6 @@ main(void)
 	sigprocmask(SIG_BLOCK, &set, NULL);
 	spawn(rcinitcmd);
 	while (1) {
-		alarm(TIMEO);
 		sigwait(&set, &sig);
 		for (i = 0; i < LEN(sigmap); i++) {
 			if (sigmap[i].sig == sig) {
@@ -66,7 +63,6 @@ sigreap(void)
 {
 	while (waitpid(-1, NULL, WNOHANG) > 0)
 		;
-	alarm(TIMEO);
 }
 
 static void
