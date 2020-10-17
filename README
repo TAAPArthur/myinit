@@ -1,22 +1,25 @@
-sinit - suckless init
+myinit - my updates to suckless init
 =====================
 
-sinit is a simple init.  It was initially based on
-Rich Felker's minimal init[1].
+myinit is a fully functional systemd replacement. It uses suckless' sinit which
+was based on Rich Felker's minimal init[1].
 
-Why?
-----
+For services it delegates that to `/bin/rc.init`
+`/bin/rc.init` will run every file in /var/init/init.d/
+Similar file is present for shutdown `/bin/rc.shutdown`
+`/bin/rc.shutdown` will run every file in /var/init/shutdown.d/
 
-I wanted to get rid of Busybox init on my toy distro[2].
 
-How?
-----
+/bin/rc.init will respawn all services defined in /var/init/services.d/
+A service is just an executable file. Often is just exec something in the path.
+Non executable files will be ignored along with files that are hidden
 
-There are 3 signals that sinit will act on.
 
-      SIGUSR1: powers off the machine.
-      SIGINT:  reboots the machine (or alternatively via ctrl-alt-del).
-      SIGCHLD: reap children
+Our use of signals differs from sinit
+SIGINT : powers off the machine.
+SIGUSR1: reboots the machine
+SIGUSR2: soft-reboots the machine. We kill all running processes but before unmounting, we exec /sbin/init
+SIGCHLD: is explicitly ignored so it will auto reap children
 
 To see how sinit integrates with the init scripts, then have
 a look at [3].
@@ -24,3 +27,4 @@ a look at [3].
 [1] https://gist.github.com/rofl0r/6168719
 [2] http://git.2f30.org/morpheus/
 [3] http://git.2f30.org/ports/tree/fs/
+[4] http://troubleshooters.com/linux/diy/suckless_init_on_plop.htm

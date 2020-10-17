@@ -9,79 +9,53 @@
 
 #define LEN(x) (sizeof (x) / sizeof *(x))
 
-static void sigpoweroff(void);
-static void sigreap(void);
-static void sigreboot(void);
-static void spawn(char *const []);
+static void spawn(char* const []);
 
 static struct {
-	int sig;
-	void (*handler)(void);
+    int sig;
+    char* const cmd[3];
 } sigmap[] = {
-	{ SIGUSR1, sigpoweroff },
-	{ SIGCHLD, sigreap     },
-	{ SIGINT,  sigreboot   },
+    { SIGINT, { "/bin/rc.shutdown", "poweroff", NULL }},
+    { SIGUSR1, {"/bin/rc.shutdown", "reboot", NULL }},
+    { SIGUSR2, {"/bin/rc.shutdown", "soft-reboot", NULL }},
 };
-
-#include "config.h"
+static char* const rcInitCmd[]     = { "/bin/rc.init", NULL };
 
 static sigset_t set;
 
+static void
+spawn(char* const argv[]) {
+    switch(fork()) {
+        case 0:
+            sigprocmask(SIG_UNBLOCK, &set, NULL);
+            setsid();
+            signal(SIGCHLD, SIG_DFL);
+            execvp(argv[0], argv);
+            perror("Could not execvp");
+            _exit(1);
+        case -1:
+            perror("fork");
+    }
+}
+
 int
-main(void)
-{
-	int sig;
-	size_t i;
-
-	if (getpid() != 1)
-		return 1;
-	chdir("/");
-	sigfillset(&set);
-	sigprocmask(SIG_BLOCK, &set, NULL);
-	spawn(rcinitcmd);
-	while (1) {
-		sigwait(&set, &sig);
-		for (i = 0; i < LEN(sigmap); i++) {
-			if (sigmap[i].sig == sig) {
-				sigmap[i].handler();
-				break;
-			}
-		}
-	}
-	/* not reachable */
-	return 0;
-}
-
-static void
-sigpoweroff(void)
-{
-	spawn(rcpoweroffcmd);
-}
-
-static void
-sigreap(void)
-{
-	while (waitpid(-1, NULL, WNOHANG) > 0)
-		;
-}
-
-static void
-sigreboot(void)
-{
-	spawn(rcrebootcmd);
-}
-
-static void
-spawn(char *const argv[])
-{
-	switch (fork()) {
-	case 0:
-		sigprocmask(SIG_UNBLOCK, &set, NULL);
-		setsid();
-		execvp(argv[0], argv);
-		perror("execvp");
-		_exit(1);
-	case -1:
-		perror("fork");
-	}
+main(void) {
+    int sig;
+    size_t i;
+    chdir("/");
+    sigfillset(&set);
+    sigprocmask(SIG_BLOCK, &set, NULL);
+    signal(SIGCHLD, SIG_IGN);
+    spawn(rcInitCmd);
+    while(1) {
+        sigwait(&set, &sig);
+        for(i = 0; i < LEN(sigmap); i++) {
+            if(sigmap[i].sig == sig) {
+                execvp(sigmap[i].cmd[0], sigmap[i].cmd);
+                perror("Could not execvp");
+            }
+        }
+    }
+    /* not reachable */
+    return 0;
 }
