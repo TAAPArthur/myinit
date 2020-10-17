@@ -1,0 +1,3 @@
+#!/bin/sh
+
+[ "$1" == "--soft" ] && /bin/kill -SIGUSR2 1 || /bin/kill -SIGUSR1 1

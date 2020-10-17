@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+MYINIT_SERVICE_PATH=${MYINIT_SERVICE_PATH:-/etc/myinit/services.d}
+service="$2"
+[ ! -z "$service" ] && [ -f $MYINIT_SERVICE_PATH/$service ]
+case "$1" in
+disable)
+    chmod u-x $MYINIT_SERVICE_PATH/$service
+	;;
+enable)
+    chmod u+x $MYINIT_SERVICE_PATH/$service
+	;;
+start)
+    service-spawn $MYINIT_SERVICE_PATH/$service
+    ;;
+stop)
+    touch $MYINIT_SERVICE_PATH/.$service.down
+    pkill -L -F $MYINIT_SERVICE_PATH/.$service.pid
+	;;
+restart)
+    pkill --signal SIGUSR1 -L -F $MYINIT_SERVICE_PATH/.$service.pid
+	;;
+*)
+	echo "Invalid action '$1'"
+	exit 1
+	;;
+esac

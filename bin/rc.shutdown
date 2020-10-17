@@ -1,0 +1,45 @@
+#!/bin/sh
+
+umask 022
+export MYINIT_SERVICE_PATH_SHUTDOWN=/etc/init/shutdown.d
+
+case "$1" in
+reboot|poweroff|soft-reboot)
+	;;
+*)
+	echo "Invalid action '$1' for rc.shutdown" 1>&2
+	exit 1
+	;;
+esac
+
+# Set linefeed mode to avoid staircase effect
+echo; /bin/stty onlcr
+
+echo Shutting down
+
+echo Running shutdown commands
+if [ -d  $MYINIT_SERVICE_PATH_SHUTDOWN ]; then
+    for shutdown in $MYINIT_SERVICE_PATH_SHUTDOWN/*; do
+        $shutdown
+    done
+fi
+
+echo Storing random seed
+/bin/dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
+
+/usr/bin/kill -TERM -1
+sleep 1s
+/usr/bin/kill -KILL -1
+[ "$1" == "soft-reboot" ] && exec /sbin/init
+
+echo Remounting root as read-only
+/bin/mount -o remount,ro /
+
+echo Unmounting filesystems
+/bin/umount -a
+
+/bin/sync
+
+echo bye
+
+exec /opt/bin/halt -${1:0:1}

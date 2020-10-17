@@ -1,0 +1,30 @@
+#!/bin/bash
+name=$(basename $1)
+dir=$(dirname $1)
+properName="${name#*-}"
+pidFile="$dir/.$properName.pid"
+downFile="$dir/.$properName.down"
+touch $pidFile
+[ "${FLOCKER}" != "$1" ] && exec env FLOCKER="$1" flock -F -n "$pidFile" "$0" "$@"
+echo $BASHPID > $pidFile
+
+if [ ! -x "$1" ]; then
+    echo "$* invalid arg"
+    exit 2
+fi
+
+exec &> "/var/log/$properName.log"
+
+# fork into background
+(
+echo $BASHPID > $pidFile
+trap "pkill -P $$" EXIT
+trap "pkill -P $$" USR1
+rm -f $downFile
+while true; do
+    echo respawning "$@"
+    $@ | ts
+    [ -f "$downFile" ] && break
+    sleep 1s
+done
+) &
