@@ -9,17 +9,17 @@ CC = cc
 CFLAGS   = -Wextra -Wall -Os
 LDFLAGS  = -s -static
 
-OBJ = sinit.o
-BIN = sinit
+BIN = myinit
 
 all: $(BIN)
 
-$(BIN): $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
+
+$(BIN): $(BIN).o
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 install: all
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f $(BIN) $(DESTDIR)$(PREFIX)/bin
+	install -D -t $(DESTDIR)$(PREFIX)/bin  $(BIN)
+	(cd $(DESTDIR)$(PREFIX)/bin; ln -sf $(BIN) init )
 	cp -f bin/* $(DESTDIR)$(PREFIX)/bin/
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man8
 	sed "s/VERSION/$(VERSION)/g" < $(BIN).8 > $(DESTDIR)$(MANPREFIX)/man8/$(BIN).8
