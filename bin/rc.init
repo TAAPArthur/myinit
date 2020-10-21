@@ -1,17 +1,34 @@
-#!/bin/bash
+#!/bin/sh
+# Inspired by git://git.2f30.org/fs.git
 
-[ -f /var/log/init.log ] && mv /var/log/init.log /var/log/init.log.bk
-exec &> >(ts | tee /var/log/init.log)
+umask 022
 echo System starting
 uptime
 export MYINIT_SERVICE_PATH=/etc/myinit/services.d
 export MYINIT_SERVICE_PATH_RUN_ONCE=/etc/myinit/init.d
 
-umask 022
 
+
+/bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
+/bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
+
+#/bin/mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
 /bin/mkdir -p /dev/pts
 /bin/mount -n -t devpts -o gid=5,mode=0620 devpts /dev/pts
 
+/bin/mount -o remount,ro /
+echo Checking filesystems
+/bin/fsck -ATa
+if [ $? -eq 1 ]; then
+	echo Filesystem errors exist, fix manually.
+	/bin/sh
+	/bin/halt -r
+fi
+
+echo Remounting root as read-write
+/bin/mount -o remount,rw /
+echo Mounting filesystems
+/bin/mount -a
 
 /bin/grep -q " verbose" /proc/cmdline && dmesg -n 8 || dmesg -n 3
 
@@ -52,8 +69,7 @@ fi
 
 echo Setting up ttys
 # /usr/bin/agetty --noclear -a root 38400 tty1
-/opt/bin/respawn /usr/bin/agetty --noclear -a root tty1 &
+/bin/respawn /bin/agetty --noclear -a root tty1 &
 for i in $(seq 2 3); do
-    /opt/bin/respawn /usr/bin/agetty --noclear tty$i &
+    /bin/respawn /bin/agetty --noclear tty$i &
 done
-wait

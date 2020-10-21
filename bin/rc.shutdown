@@ -27,10 +27,10 @@ fi
 echo Storing random seed
 /bin/dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
 
-/usr/bin/kill -TERM -1
+/bin/kill -TERM -1
 sleep 1s
-/usr/bin/kill -KILL -1
-[ "$1" == "soft-reboot" ] && exec /sbin/init
+/bin/kill -KILL -1
+[ "$1" == "soft-reboot" ] && exec /bin/init
 
 echo Remounting root as read-only
 /bin/mount -o remount,ro /
@@ -42,4 +42,4 @@ echo Unmounting filesystems
 
 echo bye
 
-exec /opt/bin/halt -${1:0:1}
+exec /bin/halt -${1:0:1}
