@@ -42,7 +42,6 @@ int
 main(void) {
     int sig;
     size_t i;
-    chdir("/");
     sigfillset(&set);
     sigprocmask(SIG_BLOCK, &set, NULL);
     signal(SIGCHLD, SIG_IGN);
