@@ -23,7 +23,8 @@ trap "pkill -P $$" USR1
 rm -f $downFile
 while true; do
     echo respawning "$@"
-    $@ | ts
+    $@
+    [ $? -eq 127 ] && break
     [ -f "$downFile" ] && break
     sleep 1s
 done
