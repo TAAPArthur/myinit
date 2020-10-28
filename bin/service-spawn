@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 name=$(basename $1)
 dir=$(dirname $1)
 properName="${name#*-}"
 pidFile="$dir/.$properName.pid"
 downFile="$dir/.$properName.down"
 touch $pidFile
-[ "${FLOCKER}" != "$1" ] && exec env FLOCKER="$1" flock -F -n "$pidFile" "$0" "$@"
+[ "${FLOCKER}" != "$1" ] && exec env FLOCKER="$1" flock -n "$pidFile" "$0" "$@"
 echo $BASHPID > $pidFile
 
 if [ ! -x "$1" ]; then
