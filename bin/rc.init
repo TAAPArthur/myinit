@@ -5,7 +5,6 @@ umask 022
 echo System starting
 uptime
 export MYINIT_SERVICE_PATH=/etc/myinit/services.d
-export MYINIT_SERVICE_PATH_RUN_ONCE=/etc/myinit/init.d
 
 
 
@@ -47,16 +46,6 @@ echo Storing dmesg output to /var/log/dmesg.log
 [ -f /var/log/dmesg.log ] && mv /var/log/dmesg.log /var/log/dmesg.log.bk
 /bin/dmesg > /var/log/dmesg.log
 
-echo Starting run once services
-if [ -d  $MYINIT_SERVICE_PATH_RUN_ONCE ]; then
-    for startup in $MYINIT_SERVICE_PATH_RUN_ONCE/*; do
-        echo "detected $startup"
-        if [ -x $startup ]; then
-            echo "running $service"
-            $startup &
-        fi
-    done
-fi
 echo Starting services
 if [ -d  $MYINIT_SERVICE_PATH ]; then
     for service in $MYINIT_SERVICE_PATH/*; do
