@@ -12,7 +12,8 @@ export MYINIT_SERVICE_PATH_RUN_ONCE=/etc/myinit/init.d
 /bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
 /bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
 
-#/bin/mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
+# /dev may be auto mounted by the kernel
+/bin/mountpoint -q /dev || /bin/mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
 /bin/mkdir -p /dev/pts
 /bin/mount -n -t devpts -o gid=5,mode=0620 devpts /dev/pts
 
