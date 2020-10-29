@@ -36,12 +36,6 @@ echo Bringing up the lo interface
 /bin/ip addr add 127.0.0.1/8 dev lo broadcast + scope host
 /bin/ip link set lo up
 
-# TODO restore hardware clock
-
-echo Setting random seed
-[ -f /etc/random-seed ] && /bin/cat /etc/random-seed >/dev/urandom
-/bin/dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
-
 echo Storing dmesg output to /var/log/dmesg.log
 [ -f /var/log/dmesg.log ] && mv /var/log/dmesg.log /var/log/dmesg.log.bk
 /bin/dmesg > /var/log/dmesg.log

@@ -24,9 +24,6 @@ if [ -d  $MYINIT_SERVICE_PATH_SHUTDOWN ]; then
     done
 fi
 
-echo Storing random seed
-/bin/dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
-
 /bin/kill -TERM -1
 sleep 1s
 /bin/kill -KILL -1
