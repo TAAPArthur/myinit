@@ -15,8 +15,8 @@ esac
 # Set linefeed mode to avoid staircase effect
 echo; /bin/stty onlcr
 
-echo Shutting down
-
+# Let's sync early just in case
+/bin/sync
 echo Running shutdown commands
 if [ -d  $MYINIT_SERVICE_PATH_SHUTDOWN ]; then
     for shutdown in $MYINIT_SERVICE_PATH_SHUTDOWN/*; do
@@ -34,7 +34,6 @@ echo Remounting root as read-only
 
 echo Unmounting filesystems
 /bin/umount -a
-
 /bin/sync
 
 echo bye

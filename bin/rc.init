@@ -3,14 +3,10 @@
 
 umask 022
 echo System starting
-uptime
 export MYINIT_SERVICE_PATH=/etc/myinit/services.d
-
-
 
 /bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
 /bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
-
 # /dev may be auto mounted by the kernel
 /bin/mountpoint -q /dev || /bin/mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
 /bin/mkdir -p /dev/pts
@@ -30,22 +26,10 @@ echo Remounting root as read-write
 echo Mounting filesystems
 /bin/mount -a
 
-/bin/grep -q " verbose" /proc/cmdline && dmesg -n 8 || dmesg -n 3
-
-echo Bringing up the lo interface
-/bin/ip addr add 127.0.0.1/8 dev lo broadcast + scope host
-/bin/ip link set lo up
-
-echo Storing dmesg output to /var/log/dmesg.log
-[ -f /var/log/dmesg.log ] && mv /var/log/dmesg.log /var/log/dmesg.log.bk
-/bin/dmesg > /var/log/dmesg.log
-
 echo Starting services
 if [ -d  $MYINIT_SERVICE_PATH ]; then
     for service in $MYINIT_SERVICE_PATH/*; do
-        echo "detected $service"
         if [ -x $service ]; then
-            echo "spawning $service"
             service-spawn $service
         fi
     done
