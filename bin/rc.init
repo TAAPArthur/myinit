@@ -66,10 +66,3 @@ if [ -d  $MYINIT_SERVICE_PATH ]; then
         fi
     done
 fi
-
-echo Setting up ttys
-# /usr/bin/agetty --noclear -a root 38400 tty1
-/bin/respawn /bin/agetty --noclear -a root tty1 &
-for i in $(seq 2 3); do
-    /bin/respawn /bin/agetty --noclear tty$i &
-done
