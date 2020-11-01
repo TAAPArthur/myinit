@@ -30,7 +30,7 @@ echo Starting services
 if [ -d  $MYINIT_SERVICE_PATH ]; then
     for service in $MYINIT_SERVICE_PATH/*; do
         if [ -x $service ]; then
-            service-spawn $service
+            service-spawn $service &
         fi
     done
 fi

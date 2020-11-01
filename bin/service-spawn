@@ -4,28 +4,20 @@ dir=$(dirname $1)
 properName="${name#*-}"
 pidFile="$dir/.$properName.pid"
 downFile="$dir/.$properName.down"
-touch $pidFile
-[ "${FLOCKER}" != "$1" ] && exec env FLOCKER="$1" flock -n "$pidFile" "$0" "$@"
-echo $BASHPID > $pidFile
-
 if [ ! -x "$1" ]; then
     echo "$* invalid arg"
     exit 2
 fi
 
+echo $$ > $pidFile
 exec &> "/var/log/$properName.log"
-
-# fork into background
-(
-echo $BASHPID > $pidFile
-trap "pkill -P $$" EXIT
+trap "rm -f $pidFile; pkill -P $$" EXIT
 trap "pkill -P $$" USR1
-rm -f $downFile
+trap "pkill -P $$; wait; exec $0 $*" HUP
 while true; do
     echo respawning "$@"
-    $@
+    $@ &
+    wait $!
     [ $? -eq 127 ] && break
-    [ -f "$downFile" ] && break
     sleep 1s
 done
-) &
