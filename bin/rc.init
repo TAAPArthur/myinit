@@ -5,12 +5,12 @@ umask 022
 echo System starting
 export MYINIT_SERVICE_PATH=/etc/myinit/services.d
 
-/bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
-/bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
+/bin/mountpoint -q /proc || /bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
+/bin/mountpoint -q /sys || /bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
 # /dev may be auto mounted by the kernel
 /bin/mountpoint -q /dev || /bin/mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
 /bin/mkdir -p /dev/pts
-/bin/mount -n -t devpts -o gid=5,mode=0620 devpts /dev/pts
+/bin/mountpoint -q /dev/pts || /bin/mount -n -t devpts -o mode=0620 devpts /dev/pts
 
 /bin/mount -o remount,ro /
 echo Checking filesystems
