@@ -3,11 +3,12 @@
 
 umask 022
 echo System starting
-export MYINIT_SERVICE_PATH=/etc/myinit/services.d
+MYINIT_HOME=${MYINIT_HOME:-/etc/myinit}
+MYINIT_RUN_ONCE_PATH=$MYINIT_HOME/init.d
+MYINIT_SERVICE_PATH=$MYINIT_HOME/services.d
 
 /bin/mountpoint -q /proc || /bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
 /bin/mountpoint -q /sys || /bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
-# /dev may be auto mounted by the kernel
 /bin/mountpoint -q /dev || /bin/mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
 /bin/mkdir -p /dev/pts
 /bin/mountpoint -q /dev/pts || /bin/mount -n -t devpts -o mode=0620 devpts /dev/pts
@@ -26,11 +27,10 @@ echo Remounting root as read-write
 echo Mounting filesystems
 /bin/mount -a
 
+for script in $MYINIT_RUN_ONCE_PATH/*; do
+    [ -x $script ] && script &
+done
 echo Starting services
-if [ -d  $MYINIT_SERVICE_PATH ]; then
-    for service in $MYINIT_SERVICE_PATH/*; do
-        if [ -x $service ]; then
-            service-spawn $service &
-        fi
-    done
-fi
+for service in $MYINIT_SERVICE_PATH/*; do
+    [ -x $service ] && service-spawn $service &
+done

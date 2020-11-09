@@ -5,14 +5,14 @@ myinit is a fully functional systemd replacement. It uses suckless' sinit which
 was based on Rich Felker's minimal init[1].
 
 For services it delegates that to `/bin/rc.init`
-`/bin/rc.init` will run every file in /var/init/init.d/
+`/bin/rc.init` will run every file in /etc/myinit/init.d/
 Similar file is present for shutdown `/bin/rc.shutdown`
 `/bin/rc.shutdown` will run every file in /var/init/shutdown.d/
 
-
-/bin/rc.init will respawn all services defined in /var/init/services.d/
+/bin/rc.init will respawn all services defined in /etc/myinit/services.d/
 A service is just an executable file. Often is just exec something in the path.
-Non executable files will be ignored along with files that are hidden
+
+For all 3, non executable files will be ignored along with files that are hidden
 
 
 Our use of signals differs from sinit
