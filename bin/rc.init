@@ -28,7 +28,7 @@ echo Mounting filesystems
 /bin/mount -a
 
 for script in $MYINIT_RUN_ONCE_PATH/*; do
-    [ -x $script ] && script &
+    [ -x $script ] && $script
 done
 echo Starting services
 for service in $MYINIT_SERVICE_PATH/*; do
