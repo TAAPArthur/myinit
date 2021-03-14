@@ -27,10 +27,10 @@ echo Remounting root as read-write
 echo Mounting filesystems
 /bin/mount -a
 
-for script in $MYINIT_RUN_ONCE_PATH/*; do
+for script in "$MYINIT_RUN_ONCE_PATH"/*; do
     [ -x $script ] && $script
 done
 echo Starting services
-for service in $MYINIT_SERVICE_PATH/*; do
+for service in "$MYINIT_SERVICE_PATH"/*; do
     [ -x $service ] && service-spawn $service &
 done
