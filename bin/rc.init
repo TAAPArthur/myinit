@@ -26,6 +26,7 @@ echo Remounting root as read-write
 /bin/mount -o remount,rw /
 echo Mounting filesystems
 /bin/mount -a
+/bin/swapon -a
 
 for script in "$MYINIT_RUN_ONCE_PATH"/*; do
     [ -x $script ] && $script
