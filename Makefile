@@ -18,9 +18,8 @@ $(BIN): $(BIN).o
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 install: all
-	install -D -t $(DESTDIR)$(PREFIX)/bin  $(BIN)
-	(cd $(DESTDIR)$(PREFIX)/bin; ln -sf $(BIN) init )
-	cp -f bin/* $(DESTDIR)$(PREFIX)/bin/
+	install -D -t $(DESTDIR)$(PREFIX)/bin  $(BIN) bin/*
+	ln -sf $(BIN) $(DESTDIR)$(PREFIX)/bin/init
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man8
 	sed "s/VERSION/$(VERSION)/g" < $(BIN).8 > $(DESTDIR)$(MANPREFIX)/man8/$(BIN).8
 
