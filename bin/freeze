@@ -1,0 +1,2 @@
+#!/bin/sh
+printf "freeze" > /sys/power/state
