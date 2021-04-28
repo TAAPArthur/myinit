@@ -1,6 +1,5 @@
 #!/bin/sh
 
-umask 022
 export MYINIT_SERVICE_PATH_SHUTDOWN=/etc/init/shutdown.d
 
 case "$1" in
@@ -19,7 +18,7 @@ echo; /bin/stty onlcr
 /bin/sync
 echo Running shutdown commands
 if [ -d  $MYINIT_SERVICE_PATH_SHUTDOWN ]; then
-    for shutdown in $MYINIT_SERVICE_PATH_SHUTDOWN/*; do
+    for shutdown in "$MYINIT_SERVICE_PATH_SHUTDOWN"/*; do
         $shutdown
     done
 fi
@@ -27,7 +26,7 @@ fi
 /bin/kill -TERM -1
 sleep 1s
 /bin/kill -KILL -1
-[ "$1" == "soft-reboot" ] && exec /bin/init
+[ "$1" = "soft-reboot" ] && exec /bin/init
 
 echo Remounting root as read-only
 /bin/mount -o remount,ro /
@@ -38,4 +37,5 @@ echo Unmounting filesystems
 
 echo bye
 
-exec /bin/halt -${1:0:1}
+[ "$1" = poweroff ] && exec /bin/halt -p
+exec /bin/halt -r
