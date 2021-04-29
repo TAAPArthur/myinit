@@ -1,22 +1,23 @@
 #!/bin/sh
-name=$(basename $1)
-dir=$(dirname $1)
+# shellcheck disable=SC2064
+
+name=$(basename "$1")
+dir=$(dirname "$1")
 properName="${name#*-}"
 pidFile="$dir/.$properName.pid"
-downFile="$dir/.$properName.down"
 if [ ! -x "$1" ]; then
     echo "$* invalid arg"
     exit 2
 fi
 
-echo $$ > $pidFile
-exec &> "/var/log/$properName.log"
+echo $$ > "$pidFile"
+exec > "/var/log/$properName.log" 2>&1
 trap "rm -f $pidFile; pkill -P $$" EXIT
 trap "pkill -P $$" USR1
 trap "pkill -P $$; wait; exec $0 $*" HUP
 while true; do
     echo respawning "$@"
-    $@ &
+    "$@" &
     wait $!
     [ $? -eq 127 ] && break
     sleep 1s

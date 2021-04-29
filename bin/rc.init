@@ -29,9 +29,9 @@ echo Mounting filesystems
 /bin/swapon -a
 
 for script in "$MYINIT_RUN_ONCE_PATH"/*; do
-    [ -x $script ] && $script
+    [ -x "$script" ] && $script
 done
 echo Starting services
 for service in "$MYINIT_SERVICE_PATH"/*; do
-    [ -x $service ] && service-spawn $service &
+    [ -x "$service" ] && service-spawn "$service" &
 done

@@ -1,34 +1,39 @@
 #!/bin/sh -e
 MYINIT_SERVICE_PATH=${MYINIT_SERVICE_PATH:-/etc/myinit/services.d}
 service="$2"
-[ ! -z "$service" ] && [ -f $MYINIT_SERVICE_PATH/$service ]
+[ -n "$service" ] && [ -f "$MYINIT_SERVICE_PATH/$service" ]
 case "$1" in
 create)
-    cat - > $MYINIT_SERVICE_PATH/$service
+    cat - > "$MYINIT_SERVICE_PATH/$service"
     ;;
 delete)
-    rm $MYINIT_SERVICE_PATH/$service
+    rm "$MYINIT_SERVICE_PATH/$service"
     ;;
 disable)
-    chmod -x $MYINIT_SERVICE_PATH/$service
+    chmod -x "$MYINIT_SERVICE_PATH/$service"
     ;;
 enable)
-    chmod u+x $MYINIT_SERVICE_PATH/$service
+    chmod u+x "$MYINIT_SERVICE_PATH/$service"
     ;;
 respawn)
-    kill -SIGHUP $(cat $MYINIT_SERVICE_PATH/.$service.pid)
+    read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
+    kill -SIGHUP "$pid"
     ;;
 restart)
-    pkill -P $(cat $MYINIT_SERVICE_PATH/.$service.pid)
+    read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
+    pkill -P "$pid"
     ;;
 signal)
-    pkill $2 -P  $(cat $MYINIT_SERVICE_PATH/.$service.pid)
+    read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
+    # shellcheck disable=SC2086
+    pkill $2 -P "$pid"
     ;;
 start)
-    service-spawn $MYINIT_SERVICE_PATH/$service &
+    service-spawn "$MYINIT_SERVICE_PATH/$service" &
     ;;
 stop)
-    kill $(cat $MYINIT_SERVICE_PATH/.$service.pid)
+    read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
+    kill "$pid"
     ;;
 *)
     echo "Invalid action '$1'"
