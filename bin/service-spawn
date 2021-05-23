@@ -11,10 +11,12 @@ if [ ! -x "$1" ]; then
 fi
 
 echo $$ > "$pidFile"
-exec > "/var/log/$properName.log" 2>&1
-trap "rm -f $pidFile; pkill -P $$" EXIT
-trap "pkill -P $$" USR1
-trap "pkill -P $$; wait; exec $0 $*" HUP
+SERVICE_LOG=${SERVICE_LOG_DIR:-/var/log}/$properName.log
+[ -r "$SERVICE_LOG" ] && exec > "$SERVICE_LOG" 2>&1
+trap "rm -f $pidFile; kill 0" EXIT
+trap "kill 0" USR1
+trap "exit" INT
+trap "echo external signal received" TERM
 while true; do
     echo respawning "$@"
     "$@" &

@@ -15,25 +15,19 @@ disable)
 enable)
     chmod u+x "$MYINIT_SERVICE_PATH/$service"
     ;;
-respawn)
-    read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
-    kill -SIGHUP "$pid"
+get-pid)
+    cat "$MYINIT_SERVICE_PATH/.$service.pid"
     ;;
 restart)
     read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
-    pkill -P "$pid"
-    ;;
-signal)
-    read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
-    # shellcheck disable=SC2086
-    pkill $2 -P "$pid"
+    kill -USR1 "$pid"
     ;;
 start)
     service-spawn "$MYINIT_SERVICE_PATH/$service" &
     ;;
 stop)
     read -r pid < "$MYINIT_SERVICE_PATH/.$service.pid"
-    kill "$pid"
+    kill -INT "$pid"
     ;;
 *)
     echo "Invalid action '$1'"
