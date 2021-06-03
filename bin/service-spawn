@@ -22,5 +22,5 @@ while true; do
     "$@" &
     wait $!
     [ $? -eq 127 ] && break
-    sleep 1s
+    sleep 1
 done
