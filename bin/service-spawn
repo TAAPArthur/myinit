@@ -10,6 +10,8 @@ if [ ! -x "$1" ]; then
     exit 2
 fi
 
+[ -z "$SKIP_LOCK" ] && SKIP_LOCK=1 exec flock -n "$0" "$0" "$@"
+
 echo $$ > "$pidFile"
 SERVICE_LOG=${SERVICE_LOG_DIR:-/var/log}/$properName.log
 [ -r "$SERVICE_LOG" ] && exec > "$SERVICE_LOG" 2>&1
