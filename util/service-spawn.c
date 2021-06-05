@@ -3,24 +3,30 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/file.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 static int shuttingDown;
+static pid_t pid;
+
 void killChildren(int i) {
-    if(i == SIGINT)
+    if(i == SIGINT || i == SIGQUIT)
         shuttingDown = 1;
+    kill(-pid, SIGINT);
     kill(0, SIGTERM);
 }
 
 void main(int argc, char*argv[]) {
     struct sigaction ign_action  = {SIG_IGN};
-    struct sigaction action  = {killChildren};
-    sigaction(SIGINT, &action, NULL);
-    sigaction(SIGQUIT, &action, NULL);
+    // Don't die when killing process group
     sigaction(SIGTERM, &ign_action, NULL);
-    sigaction(SIGUSR1, &action, NULL);
+    struct sigaction action  = {killChildren};
+    // shutdown and kill child
+    sigaction(SIGINT, &action, NULL);
+    // kill child; effectively restarts the process
+    sigaction(SIGHUP, &action, NULL);
     const char* pidFile = argv[1];
     const char* cmd = argv[2];
     int fd = open(pidFile, O_WRONLY|O_CREAT|O_TRUNC);
@@ -31,7 +37,6 @@ void main(int argc, char*argv[]) {
     }
 
     while(!shuttingDown) {
-        pid_t pid;
         if(!(pid=fork())) {
             execvp(cmd, argv+2);
             exit(1);

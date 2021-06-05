@@ -29,7 +29,7 @@ get-pid)
     ;;
 restart)
     read -r pid < "$MYINIT_SERVICE_PATH/$pidFile"
-    kill -USR1 "$pid"
+    kill -HUP "$pid"
     ;;
 start)
     SERVICE_LOG=${SERVICE_LOG_DIR:-/var/log}/$properName.log
