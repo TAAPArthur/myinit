@@ -1,12 +1,6 @@
-# sinit version
-VERSION = 1.1
-
 # paths
 PREFIX = /usr/
 MANPREFIX = $(PREFIX)/share/man
-
-CC = cc
-CFLAGS   = -Wextra -Wall -Os
 
 BIN = myinit
 UTILS_SRC = $(wildcard util/*.c)
@@ -14,12 +8,8 @@ UTILS = $(UTILS_SRC:.c=)
 
 all: $(BIN) $(UTILS)
 
-
-$(BIN): $(BIN).o
-	$(CC) -s -static $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
 %: %.o
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CC) -static -o $@ $^ $(LDFLAGS)
 
 install: all
 	install -D -t $(DESTDIR)$(PREFIX)/bin  $(BIN) $(UTILS) bin/*
