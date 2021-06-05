@@ -33,5 +33,5 @@ for script in "$MYINIT_RUN_ONCE_PATH"/*; do
 done
 echo Starting services
 for service in "$MYINIT_SERVICE_PATH"/*; do
-    [ -x "$service" ] && service-spawn "$(basename "$service")" &
+    [ -x "$service" ] && service-manager start "$(basename "$service")"
 done

@@ -32,7 +32,10 @@ restart)
     kill -USR1 "$pid"
     ;;
 start)
-    service-spawn "$MYINIT_SERVICE_PATH/$service" &
+    SERVICE_LOG=${SERVICE_LOG_DIR:-/var/log}/$properName.log
+    [ -r "$SERVICE_LOG" ] && exec > "$SERVICE_LOG" 2>&1
+    shift 2
+    /bin/service-spawn "$pidFile" "$MYINIT_SERVICE_PATH/$service" "$@" &
     ;;
 stop)
     read -r pid < "$MYINIT_SERVICE_PATH/$pidFile"
