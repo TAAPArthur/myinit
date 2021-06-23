@@ -30,11 +30,11 @@ void main(int argc, char*argv[]) {
     const char* pidFile = argv[1];
     const char* cmd = argv[2];
     int fd = open(pidFile, O_WRONLY|O_CREAT|O_TRUNC);
-    dprintf(fd, "%d\n", getpid());
     if(flock(fd, LOCK_EX | LOCK_NB) == -1) {
         perror("Could not take lock");
         exit(2);
     }
+    dprintf(fd, "%d\n", getpid());
 
     while(!shuttingDown) {
         if(!(pid=fork())) {
