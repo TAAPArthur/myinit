@@ -29,9 +29,13 @@ void main(int argc, char*argv[]) {
     sigaction(SIGHUP, &action, NULL);
     const char* pidFile = argv[1];
     const char* cmd = argv[2];
-    int fd = open(pidFile, O_WRONLY|O_CREAT|O_TRUNC);
+    int fd = open(pidFile, O_WRONLY|O_CREAT);
     if(flock(fd, LOCK_EX | LOCK_NB) == -1) {
         perror("Could not take lock");
+        exit(2);
+    }
+    if(ftruncate(fd, 0) != 0){
+        perror("Could not truncate file");
         exit(2);
     }
     dprintf(fd, "%d\n", getpid());
