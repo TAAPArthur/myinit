@@ -4,8 +4,7 @@ service="$2"
 
 [ -n "$service" ]
 if [ ! -f "$MYINIT_SERVICE_PATH/$service" ]; then
-    cd "$MYINIT_SERVICE_PATH"
-    service="$(echo *-"$service")"
+    service="$(cd "$MYINIT_SERVICE_PATH"; echo *-"$service")"
 fi
 [ -f "$MYINIT_SERVICE_PATH/$service" ]
 
@@ -33,9 +32,9 @@ restart)
     ;;
 start)
     SERVICE_LOG=${SERVICE_LOG_DIR:-/var/log}/$properName.log
-    [ -r "$SERVICE_LOG" ] && exec > "$SERVICE_LOG" 2>&1
+    exec > "$SERVICE_LOG" 2>&1 || true
     shift 2
-    /bin/service-spawn "$pidFile" "$MYINIT_SERVICE_PATH/$service" "$@" &
+    /bin/service-spawn "$MYINIT_SERVICE_PATH/$pidFile" "$MYINIT_SERVICE_PATH/$service" "$@" &
     ;;
 stop)
     read -r pid < "$MYINIT_SERVICE_PATH/$pidFile"
