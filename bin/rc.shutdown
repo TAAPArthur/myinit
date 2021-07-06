@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export MYINIT_SERVICE_PATH_SHUTDOWN=/etc/init/shutdown.d
+export MYINIT_SERVICE_PATH_SHUTDOWN=${MYINIT_SERVICE_PATH_SHUTDOWN:-/etc/myinit/shutdown.d}
 
 case "$1" in
 reboot|poweroff|soft-reboot)
@@ -17,7 +17,7 @@ echo; /bin/stty onlcr
 # Let's sync early just in case
 /bin/sync
 echo Running shutdown commands
-if [ -d  $MYINIT_SERVICE_PATH_SHUTDOWN ]; then
+if [ -d "$MYINIT_SERVICE_PATH_SHUTDOWN" ]; then
     for shutdown in "$MYINIT_SERVICE_PATH_SHUTDOWN"/*; do
         $shutdown
     done
