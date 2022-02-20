@@ -18,7 +18,7 @@ void killChildren(int i) {
     kill(0, SIGTERM);
 }
 
-void main(int argc, char*argv[]) {
+int main(int argc, char*argv[]) {
     struct sigaction ign_action  = {SIG_IGN};
     // Don't die when killing process group
     sigaction(SIGTERM, &ign_action, NULL);
@@ -66,4 +66,5 @@ void main(int argc, char*argv[]) {
     printf("Service stopped\n");
     unlink(pidFile);
     close(fd);
+    return 0;
 }
