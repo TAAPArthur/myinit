@@ -29,7 +29,7 @@ int main(int argc, char*argv[]) {
     sigaction(SIGHUP, &action, NULL);
     const char* pidFile = argv[1];
     const char* cmd = argv[2];
-    int fd = open(pidFile, O_WRONLY|O_CREAT);
+    int fd = open(pidFile, O_WRONLY|O_CREAT|O_CLOEXEC);
     if(fd < 0) {
         perror("Could not open pidfile");
         exit(2);
