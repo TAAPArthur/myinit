@@ -1,0 +1,26 @@
+#!/bin/sh -e
+
+mount_dirs() {
+    mount -o bind /dev "$1/dev"
+    mount -t proc  proc "$1/proc"
+    mount -t tmpfs run "$1/run"
+    mount -t sysfs sys "$1/sys"
+    mount "/tmp" -o bind "$1/tmp"
+    mount /etc/resolv.conf -o bind "$1/etc/resolv.conf"
+}
+
+unmount_dirs() {
+    umount "$1/dev"
+    umount "$1/proc"
+    umount "$1/run"
+    umount "$1/sys"
+    umount "$1/tmp"
+    umount "$1/etc/resolv.conf"
+}
+
+[ -d "$1" ]
+DIR="$1"
+trap 'unmount_dirs $DIR' EXIT
+set -x
+mount_dirs "$DIR"
+chroot "$@"
